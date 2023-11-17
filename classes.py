@@ -1,0 +1,2 @@
+class draggable_box:
+    
