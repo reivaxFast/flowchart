@@ -5,7 +5,7 @@ pygame.init()
 width, height = 1920, 1009
 window = pygame.display.set_mode((width, height), RESIZABLE)
 pygame.display.set_caption("Flowchart")
-
+box = classes.draggable_box(10, 10)
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -13,4 +13,5 @@ while True:
             sys.exit()
     mx, my = pygame.mouse.get_pos()
     mpressed, _, _ = pygame.mouse.get_pressed()
+    box.update(window)
     pygame.display.flip() #update
