@@ -1,16 +1,24 @@
 import pygame
 
+def gradient(colour_1: tuple, colour_2: tuple, gadient: float):
+    ret = (0,0,0)
+    for i in range(3):
+        ret[i] = (colour_1 * (1-gadient)) + (colour_1 * gadient)
+    return ret
+
 class draggable_box:
     def __init__(self, x: int, y: int, w: int, h: int, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200)) -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
         self.h = h #height
-        self.colour = (255, 255, 255) #colour
+        self.colour = normal_colour #colour
+        self.normal_colour = normal_colour #default colour
+        self.shaded_colour = shaded_colour #shaded colour
+        self.gradient = 0 #how far between shaded and default is the colour (0 is unshaded, 1 is shaded)
         self.selected = True #is the box being moved?
         self.mpessedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
-        self.normal_colour = normal_colour
-        self.shaded_colour = shaded_colour
+        
     def update(self, screen):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, _ = pygame.mouse.get_pressed() #getting mouse state
