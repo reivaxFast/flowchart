@@ -1,6 +1,10 @@
 import pygame, sys, classes
 from pygame.locals import *
 
+def display_boxes(boxes):
+    for p in boxes:
+            p.display()
+
 pygame.init() #initailise pygame
 pygame.display.set_caption("Flowchart") #set title
 clock = pygame.time.Clock() # setuo for framerate for consitiant animations
@@ -26,14 +30,14 @@ while True:
     
     for i, box in enumerate(boxes): #this checks whether a box is selected
         if box.selected: #the box.selected is a variable telling whether the box is selected
-            boxes.append(boxes.pop(i)) #this moves the box
-            selected = True
-            break
-    if selected:
-        boxes[-1].update()
-
-        for i in boxes:
-            i.display()
+            boxes.append(boxes.pop(i)) #this moves the selcted box to the back so it is displayed at the front (boxes at the front are displayed first, so boxes at the back are displayed last)
+            selected = True #the box is set to being dragged
+            break #no need to check for more boxes being selected because only one box can be selected at once
+    if selected: #if a box is selected:
+        boxes[-1].update() #only the last element needs to be updated, see above
+        for i in boxes[:-1]: #all the elements need to be returned to their original colour except the last, as it is selected (if a box is selected, no boxes should be shaded)
+            i.return_to_normal_colour() #return to unshaded
+        display_boxes(boxes)
     else:
         hov = False
         for i in reversed(boxes):
@@ -42,8 +46,7 @@ while True:
                 hov = True
             else:
                 i.return_to_normal_colour()
-        for i in boxes:
-            i.display()
+        display_boxes(boxes)
     
     pygame.display.flip() #update
     clock.tick(framerate)
