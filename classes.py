@@ -13,14 +13,15 @@ class draggable_box:
         self.gradient = 0 #how far between shaded and default is the colour (0 is unshaded, 1 is shaded)
         self.gradient_speed = gradient_speed #how fast to change the gradient
         self.selected = True #is the box being moved?
-        self.mpessedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
+        self.mpressedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
+        self.rpressedlast = False
         
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
-        mpressed, _, _ = pygame.mouse.get_pressed() #getting mouse state
+        mpressed, rpressed, _ = pygame.mouse.get_pressed() #getting mouse state
         if self.hover() and not self.selected:
             self.colour = self.return_gradient(1)
-            if mpressed and not self.mpessedlast:
+            if mpressed and not self.mpressedlast:
                 self.selected = True
                 self.offsetx = self.x - mx
                 self.offsety = self.y - my
@@ -32,7 +33,8 @@ class draggable_box:
             self.y = my + self.offsety
         else:
             self.selected = False
-        self.mpessedlast = mpressed
+        self.mpressedlast = mpressed
+        self.rpressedlast = rpressed
     
     def display(self):
         pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
@@ -54,3 +56,10 @@ class draggable_box:
         self.gradient += change * self.gradient_speed
         self.gradient = max(0, min(1, self.gradient))
         return tuple(ret)
+    
+    def rclick(self):
+        mpressed, rpressed, _ = pygame.mouse.get_pressed()
+        if rpressed and not self.rpressedlast and self.hover():
+            return True
+        else:
+            return False
