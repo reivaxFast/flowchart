@@ -18,11 +18,11 @@ class draggable_box:
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, _ = pygame.mouse.get_pressed() #getting mouse state
-        if self.hover() and not self.selected:
-            self.colour = self.return_gradient(1)
-            if mpressed and not self.mpessedlast:
-                self.selected = True
-                self.offsetx = self.x - mx
+        if self.hover() and not self.selected: #if being hovered on and not being selected:
+            self.colour = self.return_gradient(1) #go to shaded colour
+            if mpressed and not self.mpessedlast: #if the mouse is being pressed and the mouse was not being pressed last frame (so that the box must have been clicked on):
+                self.selected = True #the box is therefore selected
+                self.offsetx = self.x - mx #this is so the box does not jump when it is clicked
                 self.offsety = self.y - my
         else:
             self.colour = self.return_gradient(-1)

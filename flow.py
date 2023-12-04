@@ -49,4 +49,4 @@ while True:
         display_boxes(boxes)
     
     pygame.display.flip() #update
-    clock.tick(framerate)
+    clock.tick(framerate) 
