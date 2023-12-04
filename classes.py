@@ -48,8 +48,8 @@ class draggable_box:
             return False
     
     def return_gradient(self, change: int): #in change, -1 decreases, 0 does not change, 1 increases the gradient variable
-        ret = [0,0,0]
-        for i in range(3):
+        ret = [0,0,0] #list to be returned
+        for i in range(3): #
             ret[i] = (self.normal_colour[i] * (1-self.gradient)) + (self.shaded_colour[i] * self.gradient)
         self.gradient += change * self.gradient_speed
         self.gradient = max(0, min(1, self.gradient))

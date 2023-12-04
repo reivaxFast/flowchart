@@ -38,13 +38,13 @@ while True:
         for i in boxes[:-1]: #all the elements need to be returned to their original colour except the last, as it is selected (if a box is selected, no boxes should be shaded)
             i.return_to_normal_colour() #return to unshaded
         display_boxes(boxes)
-    else:
-        hov = False
-        for i in reversed(boxes):
-            if i.hover() and not hov:
-                i.update()
+    else: #if no box is selected
+        hov = False #is a box veing hovered on?
+        for i in reversed(boxes): #reversed because boxes at the back of the list appear to be at the front and so need to be updated first
+            if i.hover() and not hov: #if the box i is being hovered on and no other boxes can be hovered on (only one box can be hovered on at once)
                 hov = True
-            else:
+                i.update() #only the box being hovered on needs to be updated
+            else: #all other boxes need to be returned to normal colour
                 i.return_to_normal_colour()
         display_boxes(boxes)
     
