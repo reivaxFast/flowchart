@@ -18,7 +18,7 @@ class draggable_box:
         
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
-        mpressed, rpressed, _ = pygame.mouse.get_pressed() #getting mouse state
+        mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
         if self.hover() and not self.selected:
             self.colour = self.return_gradient(1)
             if mpressed and not self.mpressedlast:
@@ -58,8 +58,8 @@ class draggable_box:
         return tuple(ret)
     
     def rclick(self):
-        mpressed, rpressed, _ = pygame.mouse.get_pressed()
-        if rpressed and not self.rpressedlast and self.hover():
+        _, _, rpressed = pygame.mouse.get_pressed()
+        if rpressed and self.hover():
             return True
         else:
             return False
