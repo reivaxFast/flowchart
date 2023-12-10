@@ -4,14 +4,26 @@ from pygame.locals import *
 def display_boxes(boxes):
     for p in boxes:
             p.display()
-            
-def draw_line(boxes: list, indexs: tuple, boxes_index: list):
+
+def get_line_positions(start: tuple, end: tuple):
+    p1 = (start[0], (start[1]+end[1])/2)
+    p2 = (end[0], (start[1]+end[1])/2)
+    return [start, p1, p2, end]
+
+def draw_line(boxes: list, indexs: tuple, boxes_index: list, width: int = 10):
+    win = window
     index1 = boxes_index.index(indexs[0])
+    start = (boxes[index1].x+(boxes[index1].w/2), boxes[index1].y + boxes[index1].h)
     if indexs[1] != -1:
         index2 = boxes_index.index(indexs[1])
-        pygame.draw.line(window, (255, 255, 255), (boxes[index1].x+(boxes[index1].w/2), boxes[index1].y + boxes[index1].h), (boxes[index2].x + (boxes[index2].w/2), boxes[index2].y), 10)
+        end = (boxes[index2].x + (boxes[index2].w/2), boxes[index2].y)
     else:
-        pygame.draw.line(window, (255, 255, 255), (boxes[index1].x+(boxes[index1].w/2), boxes[index1].y + boxes[index1].h), pygame.mouse.get_pos(), 10)
+        end = pygame.mouse.get_pos()
+    
+    points = get_line_positions(start, end)
+    for i in points[1:-1]:
+        pygame.draw.circle(win, (255, 255, 255), (i[0]+1, i[1]+1), (width/2))
+    pygame.draw.lines(win, (255, 255, 255), False, points, width)
 
 pygame.init() #initailise pygame
 pygame.display.set_caption("Flowchart") #set title
@@ -34,7 +46,7 @@ while True:
     mx, my = pygame.mouse.get_pos() #get mouse position
     mpressed, _, rpressed = pygame.mouse.get_pressed() #get mouse pressing state
     pygame.draw.rect(window, (31, 31, 31), pygame.Rect(0, 0, w, h)) #fill screen with blank
-    for event in pygame.event.get(): #chacking events
+    for event in pygame.event.get(): #checking events
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
