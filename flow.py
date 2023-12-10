@@ -6,9 +6,32 @@ def display_boxes(boxes):
             p.display()
 
 def get_line_positions(start: tuple, end: tuple):
-    p1 = (start[0], (start[1]+end[1])/2)
-    p2 = (end[0], (start[1]+end[1])/2)
-    return [start, p1, p2, end]
+    half_width = 50
+    li = [start]
+    if start[1] + 20 > end[1]:
+        if start[0] < end[0] + 120 and start[0]  + 120 > end[0]:
+            li.append((start[0], start[1]+10))
+            if start[0] > end[0]:
+                li.append(((start[0] - (half_width+10)), start[1]+10))
+                li.append(((start[0] - (half_width+10)), (start[1]+end[1])/2))
+                li.append(((end[0] + (half_width+10)), (start[1]+end[1])/2))
+                li.append(((end[0] + (half_width+10)), end[1]-10))
+            else:
+                li.append(((start[0] + (half_width+10)), start[1]+10))
+                li.append(((start[0] + (half_width+10)), (start[1]+end[1])/2))
+                li.append(((end[0] - (half_width+10)), (start[1]+end[1])/2))
+                li.append(((end[0] - (half_width+10)), end[1]-10))
+            li.append((end[0], end[1]-10))
+        else:
+            li.append((start[0], start[1]+10))
+            li.append(((start[0]+end[0])/2, start[1]+10))
+            li.append(((start[0]+end[0])/2, end[1]-10))
+            li.append((end[0], end[1]-10))
+    else:
+        li.append((start[0], (start[1]+end[1])/2))
+        li.append((end[0], (start[1]+end[1])/2))
+    li.append(end)
+    return li
 
 def draw_line(boxes: list, indexs: tuple, boxes_index: list, width: int = 10):
     win = window
