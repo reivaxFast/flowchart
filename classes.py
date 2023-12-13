@@ -12,21 +12,24 @@ class draggable_box:
         self.shaded_colour = shaded_colour #shaded colour
         self.gradient = 0 #how far between shaded and default is the colour (0 is unshaded, 1 is shaded)
         self.gradient_speed = gradient_speed #how fast to change the gradient
-        self.selected = True #is the box being moved?
+        self.selected = False #is the box being moved?
         self.mpressedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
         self.rpressedlast = False
         
+    def set_selected(self):
+        mx, my = pygame.mouse.get_pos() # getting mouse position
+        mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
+        if self.hover() and not self.selected and mpressed and not self.mpressedlast:
+            self.selected = True
+            self.offsetx = self.x - mx
+            self.offsety = self.y - my
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
-        if self.hover() and not self.selected:
-            self.colour = self.return_gradient(1)
-            if mpressed and not self.mpressedlast:
-                self.selected = True
-                self.offsetx = self.x - mx
-                self.offsety = self.y - my
-        else:
-            self.colour = self.return_gradient(-1)
+        if self.hover() and not self.selected and mpressed and not self.mpressedlast:
+            self.selected = True
+            self.offsetx = self.x - mx
+            self.offsety = self.y - my
         
         if self.selected and mpressed:
             self.x = mx + self.offsetx
@@ -41,13 +44,16 @@ class draggable_box:
     
     def return_to_normal_colour(self):
         self.colour = self.return_gradient(-1)
+        
+    def change_colour(self):
+        if self.hover():
+            self.colour = self.return_gradient(1)
+        else:
+            self.colour = self.return_gradient(-1)
     
     def hover(self):
         mx, my = pygame.mouse.get_pos()
-        if self.x <= mx <= self.x + self.w and self.y <= my <= self.y + self.h:
-            return True
-        else:
-            return False
+        return self.x <= mx <= self.x + self.w and self.y <= my <= self.y + self.h
     
     def return_gradient(self, change: int): #in change, -1 decreases, 0 does not change, 1 increases the gradient variable
         ret = [0,0,0] #list to be returned
