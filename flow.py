@@ -47,20 +47,25 @@ def draw_line(boxes: list, indexs: tuple, boxes_index: list, width: int = 10):
     for i in points[1:-1]:
         pygame.draw.circle(win, (255, 255, 255), (i[0]+1, i[1]+1), (width/2))
     pygame.draw.lines(win, (255, 255, 255), False, points, width)
-
+#general setup
 pygame.init() #initailise pygame
 pygame.display.set_caption("Flowchart") #set title
 clock = pygame.time.Clock() # setup for framerate for consitiant animations
 framerate = 120
 width, height = 1920, 1009 #set height and width
 window = pygame.display.set_mode((width, height), RESIZABLE) #show window
+#colours
+boxes_colour = (25, 100, 100)
+bg_colour = (31, 31, 31)
+
 boxes = [] #set up the list to hold the box classes in
 boxes_index = [] #set up list that keeps track of which box is which (so connections can be made between boxes while boxes are being moved around in lists)
 boxes_connections = []
 justline = False #justline is if a line was just connected
 data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': [], 'number of boxes': 1}
 
-boxes.append(classes.draggable_box(10, 10, 100, 100, window, (25, 100, 100)))
+boxes.append(classes.draggable_box(10, 10, 200, 75, window, boxes_colour))
+
 boxes_index.append(0)
 
 
@@ -68,7 +73,7 @@ while True:
     w, h= pygame.display.get_surface().get_size() # get size of screen
     mx, my = pygame.mouse.get_pos() #get mouse position
     mpressed, _, rpressed = pygame.mouse.get_pressed() #get mouse pressing state
-    pygame.draw.rect(window, (31, 31, 31), pygame.Rect(0, 0, w, h)) #fill screen with blank
+    window.fill(bg_colour) #fill screen with blank
     for event in pygame.event.get(): #checking events
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -84,10 +89,9 @@ while True:
         if box.selected: #the box.selected is a variable telling whether the box is selected
             boxes.append(boxes.pop(i)) #this moves the selcted box to the back so it is displayed at the front (boxes at the front are displayed first, so boxes at the back are displayed last)
             boxes_index.append(boxes_index.pop(i))
-            print(box.selected)
             if i == 0:
                 data['number of boxes'] +=1
-                boxes.insert(0, classes.draggable_box(10, 10, 100, 100, window, (25, 100, 100)))
+                boxes.insert(0, classes.draggable_box(10, 10, 200, 75, window, boxes_colour))
                 boxes_index.insert(0, data['number of boxes'])
             selected = True #the box is set to being dragged
             break #no need to check for more boxes being selected because only one box can be selected at once

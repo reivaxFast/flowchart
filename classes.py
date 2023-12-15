@@ -1,7 +1,7 @@
 import pygame
 
 class draggable_box:
-    def __init__(self, x: int, y: int, w: int, h: int, window, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1) -> None:
+    def __init__(self, x: int, y: int, w: int, h: int, window, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'if') -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
@@ -15,6 +15,13 @@ class draggable_box:
         self.selected = False #is the box being moved?
         self.mpressedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
         self.rpressedlast = False
+        self.type = box_type.lower() #the type of box
+        #types of boxes:
+        #start: at the start of the algorithm: 'START'
+        #end: end of flowchart: 'END'
+        #proscess: e.g. declaring/changing variables: 'PRO'
+        #input/output: 'IO'
+        #descision (if statement): 'IF'
         
     def set_selected(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
@@ -23,6 +30,7 @@ class draggable_box:
             self.selected = True
             self.offsetx = self.x - mx
             self.offsety = self.y - my
+    
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
@@ -40,7 +48,12 @@ class draggable_box:
         self.rpressedlast = rpressed
     
     def display(self):
-        pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
+        match self.type:
+            case 'pro': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
+            case 'start': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
+            case 'end': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
+            case 'io': pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
+            case 'if': pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
     
     def return_to_normal_colour(self):
         self.colour = self.return_gradient(-1)
