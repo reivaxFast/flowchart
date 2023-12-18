@@ -9,7 +9,7 @@ def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tu
         font = pygame.font.Font(text_type, curr_size)
         largest_x = 0
         for i in lines:
-            curr_x = font.render(i, True, green, blue).get_rect().width
+            curr_x = font.render(i, True, (255, 255, 255)).get_rect().width
             if curr_x > largest_x:
                 largest_x = curr_x
         curr_size -= 1
