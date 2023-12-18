@@ -1,5 +1,4 @@
 import pygame
-import math
 
 def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tuple, box_size: tuple, colour = (0,0,0), text_type = 'freesansbold.ttf'):
     lines = textvalue.split('\n')
