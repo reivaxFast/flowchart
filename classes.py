@@ -1,7 +1,7 @@
 import pygame
 
 class draggable_box:
-    def __init__(self, x: int, y: int, w: int, h: int, window, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'if') -> None:
+    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro') -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
