@@ -1,5 +1,5 @@
 import pygame
-
+import text
 class draggable_box:
     def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro') -> None:
         self.x = x #x position
@@ -50,8 +50,12 @@ class draggable_box:
     def display(self):
         match self.type:
             case 'pro': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
-            case 'start': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
-            case 'end': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
+            case 'start': 
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
+                text.render_text_in_box('START', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
+            case 'end': 
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
+                text.render_text_in_box('END', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
             case 'io': pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
             case 'if': pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
     
