@@ -21,10 +21,12 @@ boxes_index = [] #set up list that keeps track of which box is which (so connect
 boxes_connections = []
 justline = False #justline is if a line was just connected
 data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': []}
+default_width = 200
+default_height = 75
 
-boxes.append(classes.draggable_box(10, 10, 200, 75, window, boxes_colour, box_type='pro'))
-boxes.append(classes.draggable_box(10, 95, 200, 75, window, boxes_colour, box_type='if'))
-boxes.append(classes.draggable_box(10, 180, 200, 75, window, boxes_colour, box_type='io'))
+boxes.append(classes.draggable_box(10, 10, default_width, default_height, window, boxes_colour, box_type='pro'))
+boxes.append(classes.draggable_box(10, 95, default_width, default_height, window, boxes_colour, box_type='if'))
+boxes.append(classes.draggable_box(10, 180, default_width, default_height, window, boxes_colour, box_type='io'))
 boxes.append(classes.draggable_box((width/2)-100, 10, 200, 75, window, boxes_colour, box_type='start'))
 boxes.append(classes.draggable_box((width/2)-100, height - 95, 200, 75, window, boxes_colour, box_type='end'))
 for i in range(len(boxes)):
@@ -45,7 +47,7 @@ while True:
         justline = False #there must not be a line
     selected = False #selected is true for when a box i being dragged
     for i in boxes_connections:
-        lines.draw_line(boxes, i, boxes_index, window)
+        lines.draw_line(boxes, i, boxes_index, window, 10, default_width)
     
     for i, box in enumerate(boxes): #this checks whether a box is selected
         if box.selected: #the box.selected is a variable telling whether the box is selected
