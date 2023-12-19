@@ -1,17 +1,22 @@
-import pygame, sys, classes, lines
-from pygame.locals import *
+import pygame, sys, classes, lines, max_window
 
 def display_boxes(boxes):
     for p in boxes:
             p.display()
 
 #general setup
+caption = "Flowchart"
 pygame.init() #initailise pygame
-pygame.display.set_caption("Flowchart") #set title
+pygame.display.set_caption(caption) #set title
 clock = pygame.time.Clock() # setup for framerate for consitiant animations
 framerate = 120
 width, height = 1920, 1009 #set height and width
-window = pygame.display.set_mode((width, height), RESIZABLE) #show window
+window = pygame.display.set_mode((width, height), pygame.RESIZABLE) #show window
+
+window_handle = max_window.Call_Window.find_window(caption)  #replace MyWindow with actual name as captioned.
+if window_handle:
+    max_window.Call_Window.maximize_window(window_handle)
+
 #colours
 boxes_colour = (25, 100, 100)
 bg_colour = (31, 31, 31)
@@ -33,11 +38,16 @@ for i in range(len(boxes)):
     boxes_index.append(i)
 
 
+cursor_img =pygame.image.load('images\\icons8-resize-vertical-32.png')
+pygame.mouse.set_visible(False)
+cursor_img_rect = cursor_img.get_rect()
+
+
 while True:
     w, h= pygame.display.get_surface().get_size() # get size of screen
     mx, my = pygame.mouse.get_pos() #get mouse position
     mpressed, _, rpressed = pygame.mouse.get_pressed() #get mouse pressing state
-    window.fill(bg_colour) #fill screen with blank
+    window.fill(bg_colour) #fill screen with blank  
     for event in pygame.event.get(): #checking events
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -88,5 +98,8 @@ while True:
             data['boxes with lines out'] = data['boxes with lines out'][:-1]
             boxes_connections = boxes_connections[:-1]
     display_boxes(boxes)
+    
+    cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
+    window.blit(cursor_img, cursor_img_rect) # draw the cursor
     pygame.display.flip() #update
     clock.tick(framerate) 
