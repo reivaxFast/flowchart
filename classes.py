@@ -16,6 +16,7 @@ class draggable_box:
         self.mpressedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
         self.rpressedlast = False
         self.type = box_type.lower() #the type of box
+        self.drag_type = 0
         #types of boxes:
         #start: at the start of the algorithm: 'START'
         #end: end of flowchart: 'END'
@@ -34,16 +35,24 @@ class draggable_box:
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
-        if self.hover() and not self.selected and mpressed and not self.mpressedlast:
-            self.selected = True
-            self.offsetx = self.x - mx
-            self.offsety = self.y - my
-        
-        if self.selected and mpressed:
-            self.x = mx + self.offsetx
-            self.y = my + self.offsety
+        if self.drag_type == 0:
+            if self.hover() and not self.selected and mpressed and not self.mpressedlast:
+                self.selected = True
+                self.offsetx = self.x - mx
+                self.offsety = self.y - my
+            
+            if self.selected and mpressed:
+                self.x = mx + self.offsetx
+                self.y = my + self.offsety
+            else:
+                self.selected = False
         else:
-            self.selected = False
+            match self.drag_type:
+                case 1: self.w = max(mx - self.x, 60)
+                case 2: self.h = max(my - self.y, 20)
+                case 3: self.w, self.h = (max(mx-self.x, 60), max(my-self.y, 20))
+            
+        
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
     
@@ -71,6 +80,29 @@ class draggable_box:
     def hover(self):
         mx, my = pygame.mouse.get_pos()
         return self.x <= mx <= self.x + self.w and self.y <= my <= self.y + self.h
+    
+    def edge(self):
+        mx, my = pygame.mouse.get_pos()
+        mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
+        margin = 10
+        drag_type = 0
+        #0 is not hover, 1 is horizontal, 2 is vertical, 3 is diagonal, 4 is other diagonal
+        if not mpressed:
+            if not self.hover():
+                drag_type =  0
+            elif  (self.x + self.w)-margin< mx and self.y< my <(self.y + self.h) - margin:
+                drag_type =  1
+            elif (self.y + self.h)-margin< my and self.x< mx <(self.x + self.w) - margin:
+                drag_type =  2
+            elif (mx >= (self.x + self.w)-margin and my >= (self.y + self.h)-margin):
+                drag_type =  3
+            else:
+                drag_type =  0
+        else:
+            drag_type =  self.drag_type
+        self.drag_type = drag_type
+        return drag_type
+
     
     def return_gradient(self, change: int): #in change, -1 decreases, 0 does not change, 1 increases the gradient variable
         ret = [0,0,0] #list to be returned

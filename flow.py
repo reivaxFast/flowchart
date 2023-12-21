@@ -6,6 +6,7 @@ def display_boxes(boxes):
 
 #general setup
 caption = "Flowchart"
+icon = pygame.image.load('images\\flowchart.png')
 pygame.init() #initailise pygame
 pygame.display.set_caption(caption) #set title
 clock = pygame.time.Clock() # setup for framerate for consitiant animations
@@ -16,7 +17,7 @@ window = pygame.display.set_mode((width, height), pygame.RESIZABLE) #show window
 window_handle = max_window.Call_Window.find_window(caption)  #replace MyWindow with actual name as captioned.
 if window_handle:
     max_window.Call_Window.maximize_window(window_handle)
-
+pygame.display.set_icon(icon)
 #colours
 boxes_colour = (25, 100, 100)
 bg_colour = (31, 31, 31)
@@ -25,6 +26,8 @@ boxes = [] #set up the list to hold the box classes in
 boxes_index = [] #set up list that keeps track of which box is which (so connections can be made between boxes while boxes are being moved around in lists)
 boxes_connections = []
 justline = False #justline is if a line was just connected
+mouse_type = 0
+mouse_types = [pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 90), pygame.image.load('images\\icons8-resize-vertical-32.png'), pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 45)]
 data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': []}
 default_width = 200
 default_height = 75
@@ -38,9 +41,6 @@ for i in range(len(boxes)):
     boxes_index.append(i)
 
 
-cursor_img =pygame.image.load('images\\icons8-resize-vertical-32.png')
-pygame.mouse.set_visible(False)
-cursor_img_rect = cursor_img.get_rect()
 
 
 while True:
@@ -70,6 +70,7 @@ while True:
             break #no need to check for more boxes being selected because only one box can be selected at once
     
     if selected and not data['line to mouse']: #if a box is selected:
+        boxes[-1].edge()
         boxes[-1].update() #only the last element needs to be updated, see above
         for i in boxes: #all the elements need to be returned to their original colour except the last, as it is selected (if a box is selected, no boxes should be shaded)
             i.return_to_normal_colour() #return to unshaded
@@ -79,6 +80,7 @@ while True:
             if i.hover() and not hov: #if the box is being hovered on and this is the first box to be hovered on
                 hov = True
                 i.set_selected() #only the box being hovered on needs to be updated
+                mouse_type = i.edge()
                 i.change_colour()
             else:
                 i.return_to_normal_colour()
@@ -93,13 +95,19 @@ while True:
                     data['line to mouse'] = False #as the line has been connected to this box it is no longer connected to the mouse
                     data['boxes with lines in'].append(boxes_index[(len(boxes)-p)-1]) #this box now has a line into it
                     justline = True #so the box does not emediatly have a line from it
+        if not hov:
+            mouse_type = 0
         if rpressed and data['line to mouse'] and not justline:
             data['line to mouse'] = False
             data['boxes with lines out'] = data['boxes with lines out'][:-1]
             boxes_connections = boxes_connections[:-1]
     display_boxes(boxes)
-    
-    cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
-    window.blit(cursor_img, cursor_img_rect) # draw the cursor
+    if mouse_type == 0:
+        pygame.mouse.set_visible(True)
+    else:
+        pygame.mouse.set_visible(False)
+        cursor_img_rect = mouse_types[mouse_type-1].get_rect()
+        cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
+        window.blit(mouse_types[mouse_type-1], cursor_img_rect) # draw the cursor
     pygame.display.flip() #update
     clock.tick(framerate) 
