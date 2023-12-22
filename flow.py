@@ -57,7 +57,7 @@ while True:
         justline = False #there must not be a line
     selected = False #selected is true for when a box i being dragged
     for i in boxes_connections:
-        lines.draw_line(boxes, i, boxes_index, window, 10, default_width)
+        lines.draw_line(boxes, i, boxes_index, window, 10)
     
     for i, box in enumerate(boxes): #this checks whether a box is selected
         if box.selected: #the box.selected is a variable telling whether the box is selected
@@ -90,7 +90,7 @@ while True:
                     data['line to mouse'] = True #so another line to mouse cannot be made
                     data['boxes with lines out'].append(boxes_index[(len(boxes)-p)-1]) #so another line cannot be made out of this box
                     justline = True
-                elif boxes_connections[-1][0] != boxes_index[(len(boxes)-p)-1] and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines in'] and not i.type == 'start': #if the box is not the box that the line is coming out of and this box does not have a line in already
+                elif data['line to mouse'] and boxes_connections[-1][0] != boxes_index[(len(boxes)-p)-1] and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines in'] and not i.type == 'start': #if the box is not the box that the line is coming out of and this box does not have a line in already
                     boxes_connections[-1] = (boxes_connections[-1][0], boxes_index[(len(boxes)-p)-1]) #the second element of the tuple is set to the current box
                     data['line to mouse'] = False #as the line has been connected to this box it is no longer connected to the mouse
                     data['boxes with lines in'].append(boxes_index[(len(boxes)-p)-1]) #this box now has a line into it

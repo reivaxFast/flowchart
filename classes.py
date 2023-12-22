@@ -1,5 +1,4 @@
-import pygame
-import text
+import pygame, text, time
 class draggable_box:
     def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro') -> None:
         self.x = x #x position
@@ -17,6 +16,7 @@ class draggable_box:
         self.rpressedlast = False
         self.type = box_type.lower() #the type of box
         self.drag_type = 0
+        self.start_selected_time = 0
         #types of boxes:
         #start: at the start of the algorithm: 'START'
         #end: end of flowchart: 'END'
@@ -28,6 +28,7 @@ class draggable_box:
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
         if self.hover() and not self.selected and mpressed and not self.mpressedlast:
+            self.start_selected_time = time.time()
             self.selected = True
             self.offsetx = self.x - mx
             self.offsety = self.y - my
@@ -35,24 +36,29 @@ class draggable_box:
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
+        click_speed = 0.1
+        writing = False
         if self.drag_type == 0:
             if self.hover() and not self.selected and mpressed and not self.mpressedlast:
+                self.start_selected_time = time.time()
                 self.selected = True
                 self.offsetx = self.x - mx
                 self.offsety = self.y - my
             
             if self.selected and mpressed:
-                self.x = mx + self.offsetx
-                self.y = my + self.offsety
+                if time.time()-self.start_selected_time > click_speed:
+                    self.x = mx + self.offsetx
+                    self.y = my + self.offsety
             else:
                 self.selected = False
-        else:
+                if time.time()-self.start_selected_time < click_speed:
+                    writing = True
+        elif mpressed:
             match self.drag_type:
-                case 1: self.w = max(mx - self.x, 60)
-                case 2: self.h = max(my - self.y, 20)
-                case 3: self.w, self.h = (max(mx-self.x, 60), max(my-self.y, 20))
+                case 1: self.w = max(mx - self.x, 100)
+                case 2: self.h = max(my - self.y, 35)
+                case 3: self.w, self.h = (max(mx-self.x, 100), max(my-self.y, 35))
             
-        
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
     
