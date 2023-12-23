@@ -1,8 +1,10 @@
 import pygame, sys, classes, lines, max_window
 
-def display_boxes(boxes):
+def display_boxes(boxes, change_colour = False):
     for p in boxes:
-            p.display()
+        if change_colour:
+            p.change_colour()
+        p.display()
 
 #general setup
 caption = "Flowchart"
@@ -28,7 +30,8 @@ boxes_connections = []
 justline = False #justline is if a line was just connected
 mouse_type = 0
 mouse_types = [pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 90), pygame.image.load('images\\icons8-resize-vertical-32.png'), pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 45)]
-data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': []}
+data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': [], 'writing': False}
+mpressed_last = False
 default_width = 200
 default_height = 75
 
@@ -58,56 +61,69 @@ while True:
     selected = False #selected is true for when a box i being dragged
     for i in boxes_connections:
         lines.draw_line(boxes, i, boxes_index, window, 10)
-    
-    for i, box in enumerate(boxes): #this checks whether a box is selected
-        if box.selected: #the box.selected is a variable telling whether the box is selected
-            boxes.append(boxes.pop(i)) #this moves the selcted box to the back so it is displayed at the front (boxes at the front are displayed first, so boxes at the back are displayed last)
-            boxes_index.append(boxes_index.pop(i))
-            if i in [0, 1, 2]:
-                boxes.insert(i, classes.draggable_box(box.x , box.y, box.w, box.h, window, boxes_colour, box_type= box.type))
-                boxes_index.insert(i, len(boxes) + 1)
-            selected = True #the box is set to being dragged
-            break #no need to check for more boxes being selected because only one box can be selected at once
-    
-    if selected and not data['line to mouse']: #if a box is selected:
-        boxes[-1].edge()
-        boxes[-1].update() #only the last element needs to be updated, see above
-        for i in boxes: #all the elements need to be returned to their original colour except the last, as it is selected (if a box is selected, no boxes should be shaded)
-            i.return_to_normal_colour() #return to unshaded
+        
+    if not data['writing']:
+        for i, box in enumerate(boxes): #this checks whether a box is selected
+            if box.selected: #the box.selected is a variable telling whether the box is selected
+                boxes.append(boxes.pop(i)) #this moves the selcted box to the back so it is displayed at the front (boxes at the front are displayed first, so boxes at the back are displayed last)
+                boxes_index.append(boxes_index.pop(i))
+                if i in [0, 1, 2]:
+                    boxes.insert(i, classes.draggable_box(box.x , box.y, box.w, box.h, window, boxes_colour, box_type= box.type))
+                    boxes_index.insert(i, len(boxes) + 1)
+                selected = True #the box is set to being dragged
+                break #no need to check for more boxes being selected because only one box can be selected at once
+        
+        if selected and not data['line to mouse']: #if a box is selected:
+            boxes[-1].edge()
+            boxes[-1].update() #only the last element needs to be updated, see above
+            data['writing'] = boxes[-1].drag_type == 4
+            for i in boxes: #all the elements need to be returned to their original colour except the last, as it is selected (if a box is selected, no boxes should be shaded)
+                i.return_to_normal_colour() #return to unshaded
+        else:
+            hov = False #is one of the boxes being hovered on (only one box is allowed to be hovered on at once)
+            for p, i in enumerate(reversed(boxes)): #reversed because the boxes displayed at the front are actually at the back
+                if i.hover() and not hov: #if the box is being hovered on and this is the first box to be hovered on
+                    hov = True
+                    i.set_selected() #only the box being hovered on needs to be updated
+                    mouse_type = i.edge()
+                    if mouse_type == 0:
+                        mouse_type = 4
+                    i.change_colour()
+                else:
+                    i.return_to_normal_colour()
+                if i.rclick(): #if the box is being leftpressed on
+                    if not data['line to mouse'] and not justline and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines out'] and not i.type == 'end': #if there is not a line to the mouse, and a line was not just created and, this box is does not have a line coming out of it already
+                        boxes_connections.append((boxes_index[(len(boxes)-p)-1], -1)) #append a tuple containing the 'true' index of this box and -1 (-1 denotes a line to mouse)
+                        data['line to mouse'] = True #so another line to mouse cannot be made
+                        data['boxes with lines out'].append(boxes_index[(len(boxes)-p)-1]) #so another line cannot be made out of this box
+                        justline = True
+                    elif data['line to mouse'] and boxes_connections[-1][0] != boxes_index[(len(boxes)-p)-1] and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines in'] and not i.type == 'start': #if the box is not the box that the line is coming out of and this box does not have a line in already
+                        boxes_connections[-1] = (boxes_connections[-1][0], boxes_index[(len(boxes)-p)-1]) #the second element of the tuple is set to the current box
+                        data['line to mouse'] = False #as the line has been connected to this box it is no longer connected to the mouse
+                        data['boxes with lines in'].append(boxes_index[(len(boxes)-p)-1]) #this box now has a line into it
+                        justline = True #so the box does not emediatly have a line from it
+            if not hov:
+                mouse_type = 0
+            if rpressed and data['line to mouse'] and not justline:
+                data['line to mouse'] = False
+                data['boxes with lines out'] = data['boxes with lines out'][:-1]
+                boxes_connections = boxes_connections[:-1]
+        display_boxes(boxes)
+        if mouse_type == 0:
+            pygame.mouse.set_visible(True)
+        else:
+            pygame.mouse.set_visible(False)
+            cursor_img_rect = mouse_types[mouse_type-1].get_rect()
+            cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
+            window.blit(mouse_types[mouse_type-1], cursor_img_rect) # draw the cursor
     else:
-        hov = False #is one of the boxes being hovered on (only one box is allowed to be hovered on at once)
-        for p, i in enumerate(reversed(boxes)): #reversed because the boxes displayed at the front are actually at the back
-            if i.hover() and not hov: #if the box is being hovered on and this is the first box to be hovered on
-                hov = True
-                i.set_selected() #only the box being hovered on needs to be updated
-                mouse_type = i.edge()
-                i.change_colour()
-            else:
-                i.return_to_normal_colour()
-            if i.rclick(): #if the box is being leftpressed on
-                if not data['line to mouse'] and not justline and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines out'] and not i.type == 'end': #if there is not a line to the mouse, and a line was not just created and, this box is does not have a line coming out of it already
-                    boxes_connections.append((boxes_index[(len(boxes)-p)-1], -1)) #append a tuple containing the 'true' index of this box and -1 (-1 denotes a line to mouse)
-                    data['line to mouse'] = True #so another line to mouse cannot be made
-                    data['boxes with lines out'].append(boxes_index[(len(boxes)-p)-1]) #so another line cannot be made out of this box
-                    justline = True
-                elif data['line to mouse'] and boxes_connections[-1][0] != boxes_index[(len(boxes)-p)-1] and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines in'] and not i.type == 'start': #if the box is not the box that the line is coming out of and this box does not have a line in already
-                    boxes_connections[-1] = (boxes_connections[-1][0], boxes_index[(len(boxes)-p)-1]) #the second element of the tuple is set to the current box
-                    data['line to mouse'] = False #as the line has been connected to this box it is no longer connected to the mouse
-                    data['boxes with lines in'].append(boxes_index[(len(boxes)-p)-1]) #this box now has a line into it
-                    justline = True #so the box does not emediatly have a line from it
-        if not hov:
-            mouse_type = 0
-        if rpressed and data['line to mouse'] and not justline:
-            data['line to mouse'] = False
-            data['boxes with lines out'] = data['boxes with lines out'][:-1]
-            boxes_connections = boxes_connections[:-1]
-    display_boxes(boxes)
-    if mouse_type == 0:
-        pygame.mouse.set_visible(True)
-    else:
-        pygame.mouse.set_visible(False)
-        cursor_img_rect = mouse_types[mouse_type-1].get_rect()
-        cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
-        window.blit(mouse_types[mouse_type-1], cursor_img_rect) # draw the cursor
+        for i in boxes_connections:
+            lines.draw_line(boxes, i, boxes_index, window, 10)
+        
+        display_boxes(boxes, True)
+        if mpressed and not boxes[-1].hover() and not mpressed_last:
+            data['writing'] = False
+    print(data['writing'])
+    mpressed_last = mpressed
     pygame.display.flip() #update
     clock.tick(framerate) 

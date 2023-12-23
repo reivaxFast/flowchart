@@ -36,7 +36,7 @@ class draggable_box:
     def update(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
         mpressed, _, rpressed = pygame.mouse.get_pressed() #getting mouse state
-        click_speed = 0.1
+        click_speed = 0.15
         writing = False
         if self.drag_type == 0:
             if self.hover() and not self.selected and mpressed and not self.mpressedlast:
@@ -46,13 +46,14 @@ class draggable_box:
                 self.offsety = self.y - my
             
             if self.selected and mpressed:
-                if time.time()-self.start_selected_time > click_speed:
+                if time.time()-self.start_selected_time > click_speed and not writing:
                     self.x = mx + self.offsetx
                     self.y = my + self.offsety
             else:
                 self.selected = False
                 if time.time()-self.start_selected_time < click_speed:
-                    writing = True
+                    print('click')
+                    self.drag_type = 4
         elif mpressed:
             match self.drag_type:
                 case 1: self.w = max(mx - self.x, 100)
