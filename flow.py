@@ -29,7 +29,7 @@ boxes_index = [] #set up list that keeps track of which box is which (so connect
 boxes_connections = []
 justline = False #justline is if a line was just connected
 mouse_type = 0
-mouse_types = [pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 90), pygame.image.load('images\\icons8-resize-vertical-32.png'), pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 45)]
+mouse_types = [pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 90), pygame.image.load('images\\icons8-resize-vertical-32.png'), pygame.transform.rotate(pygame.image.load('images\\icons8-resize-vertical-32.png'), 45), pygame.image.load('images\\text_select.png')]
 data = {'line to mouse': False, 'boxes with lines in': [], 'boxes with lines out': [], 'writing': False}
 mpressed_last = False
 default_width = 200
@@ -117,6 +117,7 @@ while True:
             cursor_img_rect.center = pygame.mouse.get_pos()  # update position 
             window.blit(mouse_types[mouse_type-1], cursor_img_rect) # draw the cursor
     else:
+        pygame.mouse.set_visible(True)
         for i in boxes_connections:
             lines.draw_line(boxes, i, boxes_index, window, 10)
         
