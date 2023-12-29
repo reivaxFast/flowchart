@@ -86,8 +86,6 @@ while True:
                     hov = True
                     i.set_selected() #only the box being hovered on needs to be updated
                     mouse_type = i.edge()
-                    if mouse_type == 0:
-                        mouse_type = 4
                     i.change_colour()
                 else:
                     i.return_to_normal_colour()
@@ -120,11 +118,12 @@ while True:
         pygame.mouse.set_visible(True)
         for i in boxes_connections:
             lines.draw_line(boxes, i, boxes_index, window, 10)
-        
+        boxes[-1].write()
         display_boxes(boxes, True)
         if mpressed and not boxes[-1].hover() and not mpressed_last:
             data['writing'] = False
-    print(data['writing'])
     mpressed_last = mpressed
+    print(clock.get_fps())
     pygame.display.flip() #update
-    clock.tick(framerate) 
+    clock.tick(framerate)
+    

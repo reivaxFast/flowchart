@@ -1,6 +1,6 @@
-import pygame, text, time
+import pygame, text, time, keyboard
 class draggable_box:
-    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro') -> None:
+    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro', max_text_size: int = 15) -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
@@ -17,6 +17,12 @@ class draggable_box:
         self.type = box_type.lower() #the type of box
         self.drag_type = 0
         self.start_selected_time = 0
+        self.max_text_size = max_text_size
+        self.writing_position = (0,0)
+        self.text = ''
+        self.keys_pressed_last = []
+        self.alphabet =   'abcdefghijklmnopqrstuvwxyz1234567890\n    -='
+        self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"£$%^&*()_+'
         #types of boxes:
         #start: at the start of the algorithm: 'START'
         #end: end of flowchart: 'END'
@@ -51,8 +57,7 @@ class draggable_box:
                     self.y = my + self.offsety
             else:
                 self.selected = False
-                if time.time()-self.start_selected_time < click_speed:
-                    print('click')
+                if time.time()-self.start_selected_time < click_speed and  not self.type in ['start', 'end']:
                     self.drag_type = 4
         elif mpressed:
             match self.drag_type:
@@ -65,15 +70,20 @@ class draggable_box:
     
     def display(self):
         match self.type:
-            case 'pro': pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
+            case 'pro': 
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
+                text.render_text_in_box(self.text, self.window, (self.x, self.y), (self.w, self.h), max_size=self.max_text_size)
             case 'start': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
                 text.render_text_in_box('START', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
             case 'end': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
                 text.render_text_in_box('END', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
-            case 'io': pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
+            case 'io': 
+                pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
+                
             case 'if': pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
+        
     
     def return_to_normal_colour(self):
         self.colour = self.return_gradient(-1)
@@ -125,3 +135,19 @@ class draggable_box:
             return True
         else:
             return False
+    
+    def write(self):
+        keys = pygame.key.get_pressed()
+        for i, event in enumerate(keys):
+            if event:
+                if not i in self.keys_pressed_last:
+                    if i in range(4, len(self.alphabet)+4) and i != 42:
+                        if not keys[pygame.K_LSHIFT]:
+                            self.text = self.text + self.alphabet[i-4]
+                        else:
+                            self.text = self.text + self.shift_char[i-4]
+                    elif i == 42:
+                        self.text = self.text[:-1]
+                    self.keys_pressed_last.append(i)
+            elif i in self.keys_pressed_last:
+                self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
