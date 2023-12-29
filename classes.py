@@ -19,11 +19,24 @@ class draggable_box:
         self.start_selected_time = 0
         self.max_text_size = max_text_size
         self.writing_position = (0,0)
-        self.text = ''
+        match self.type:
+            case 'start': 
+                self.text = 'START'
+                self.centered = True
+                self.numbered_lines = False
+            case 'end': 
+                self.text = 'END'
+                self.centered = True
+                self.numbered_lines = False
+            case _: 
+                self.text = ''
+                self.centered = False
+                self.numbered_lines = True
         self.keys_pressed_last = []
         self.key_pressed_times = []
         self.alphabet =   'abcdefghijklmnopqrstuvwxyz1234567890\n    -='
         self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"£$%^&*()_+'
+        self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
         #types of boxes:
         #start: at the start of the algorithm: 'START'
         #end: end of flowchart: 'END'
@@ -73,13 +86,13 @@ class draggable_box:
         match self.type:
             case 'pro': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
-                text.render_text_in_box(self.text, self.window, (self.x, self.y), (self.w, self.h), max_size=self.max_text_size, numbered=True)
+                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'start': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
-                text.render_text_in_box('START', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
+                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'end': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
-                text.render_text_in_box('END', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
+                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'io': 
                 pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
                 
@@ -138,20 +151,25 @@ class draggable_box:
             return False
     
     def write(self):
-        keys = pygame.key.get_pressed()
-        for i, event in enumerate(keys):
-            if event and not keys[pygame.K_LCTRL] and not keys[pygame.K_RCTRL]:
-                if not i in self.keys_pressed_last or time.time() - self.key_pressed_times[self.keys_pressed_last.index(i)] > 0.5:
-                    if i in range(4, len(self.alphabet)+4) and i != 42:
-                        if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]:
-                            self.text = self.text + self.alphabet[i-4]
-                        else:
-                            self.text = self.text + self.shift_char[i-4]
-                    elif i == 42:
-                        self.text = self.text[:-1]
-                    if not i in self.keys_pressed_last:
-                        self.keys_pressed_last.append(i)
-                        self.key_pressed_times.append(time.time())
-            elif i in self.keys_pressed_last:
-                self.key_pressed_times.pop(self.keys_pressed_last.index(i))
-                self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
+        if not self.is_text_full:
+            keys = pygame.key.get_pressed()
+            for i, event in enumerate(keys):
+                if event and not keys[pygame.K_LCTRL] and not keys[pygame.K_RCTRL]:
+                    if not i in self.keys_pressed_last or time.time() - self.key_pressed_times[self.keys_pressed_last.index(i)] > 0.5:
+                        if i in range(4, len(self.alphabet)+4) and i != 42:
+                            if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]:
+                                self.text = self.text + self.alphabet[i-4]
+                            else:
+                                self.text = self.text + self.shift_char[i-4]
+                        elif i == 42:
+                            self.text = self.text[:-1]
+                        if not i in self.keys_pressed_last:
+                            self.keys_pressed_last.append(i)
+                            self.key_pressed_times.append(time.time())
+                        self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+                        if self.is_text_full:
+                            self.text = self.text[:-1]
+                            self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+                elif i in self.keys_pressed_last:
+                    self.key_pressed_times.pop(self.keys_pressed_last.index(i))
+                    self.keys_pressed_last.pop(self.keys_pressed_last.index(i))

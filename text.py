@@ -1,6 +1,5 @@
 import pygame
-#def return_lines_in_a_box()
-def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tuple, box_size: tuple, colour = (0,0,0), max_size = 10000, centered = False, min_size = 10, numbered = False):
+def return_lines_in_a_box(textvalue: str, box_size: tuple, max_size = 10000, min_size = 10, numbered = False):
     lines = textvalue.split('\n')
     if numbered:
         lines = [str(i+1) + ' ' + j for i, j in enumerate(lines)]
@@ -37,11 +36,17 @@ def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tu
                         lines.insert(largest_x_index, line[:i])
                         run = True
                         break
-        font = pygame.font.Font(text_type, curr_size)
+        return lines, curr_size, len(lines) * curr_size > box_size[1]
+    else:
+        return [''], 10, False
+def render_text_in_box(lines: list, surface: pygame.Surface, box_position: tuple, box_size: tuple, size, colour = (0,0,0), centered = False):
+    if len(''.join(lines)) != 0:
+        text_type = 'fonts/Cascadia.ttf'
+        font = pygame.font.Font(text_type, size)
         texts = [font.render(x, True, colour) for x in lines]
         if not centered:
             for i, text in enumerate(texts):
-                surface.blit(text, (box_position[0], box_position[1]+(curr_size*i)))
+                surface.blit(text, (box_position[0], box_position[1]+(size*i)))
         else:
             for i, text in enumerate(texts):
-                surface.blit(text, (box_position[0]+((box_size[0]/2)-(text.get_rect().width/2)), box_position[1]+(curr_size*i)+((box_size[1]-(curr_size * len(texts)))/2)))
+                surface.blit(text, (box_position[0]+((box_size[0]/2)-(text.get_rect().width/2)), box_position[1]+(size*i)+((box_size[1]-(size * len(texts)))/2)))
