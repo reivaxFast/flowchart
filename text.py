@@ -1,7 +1,9 @@
 import pygame
-
-def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tuple, box_size: tuple, colour = (0,0,0), max_size = 10000, centered = False, min_size = 10):
+#def return_lines_in_a_box()
+def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tuple, box_size: tuple, colour = (0,0,0), max_size = 10000, centered = False, min_size = 10, numbered = False):
     lines = textvalue.split('\n')
+    if numbered:
+        lines = [str(i+1) + ' ' + j for i, j in enumerate(lines)]
     curr_size =min(box_size[1]//len(lines), max_size)+1#plus 1 because 1 will always be subtracted
     largest_x = box_size[0]+1
     text_type = 'fonts/Cascadia.ttf'
@@ -31,7 +33,7 @@ def render_text_in_box(textvalue: str, surface: pygame.Surface, box_position: tu
                         largest_x_index=lines.index(i)
                         line = lines.pop(largest_x_index)
                         i = box_size[0]//ind_size
-                        lines.insert(largest_x_index, line[i:])
+                        lines.insert(largest_x_index, '  '+line[i:])
                         lines.insert(largest_x_index, line[:i])
                         run = True
                         break

@@ -21,6 +21,7 @@ class draggable_box:
         self.writing_position = (0,0)
         self.text = ''
         self.keys_pressed_last = []
+        self.key_pressed_times = []
         self.alphabet =   'abcdefghijklmnopqrstuvwxyz1234567890\n    -='
         self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"£$%^&*()_+'
         #types of boxes:
@@ -72,7 +73,7 @@ class draggable_box:
         match self.type:
             case 'pro': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
-                text.render_text_in_box(self.text, self.window, (self.x, self.y), (self.w, self.h), max_size=self.max_text_size)
+                text.render_text_in_box(self.text, self.window, (self.x, self.y), (self.w, self.h), max_size=self.max_text_size, numbered=True)
             case 'start': 
                 pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
                 text.render_text_in_box('START', self.window, (self.x, self.y), (self.w, self.h), max_size=20, centered = True)
@@ -139,15 +140,18 @@ class draggable_box:
     def write(self):
         keys = pygame.key.get_pressed()
         for i, event in enumerate(keys):
-            if event:
-                if not i in self.keys_pressed_last:
+            if event and not keys[pygame.K_LCTRL] and not keys[pygame.K_RCTRL]:
+                if not i in self.keys_pressed_last or time.time() - self.key_pressed_times[self.keys_pressed_last.index(i)] > 0.5:
                     if i in range(4, len(self.alphabet)+4) and i != 42:
-                        if not keys[pygame.K_LSHIFT]:
+                        if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]:
                             self.text = self.text + self.alphabet[i-4]
                         else:
                             self.text = self.text + self.shift_char[i-4]
                     elif i == 42:
                         self.text = self.text[:-1]
-                    self.keys_pressed_last.append(i)
+                    if not i in self.keys_pressed_last:
+                        self.keys_pressed_last.append(i)
+                        self.key_pressed_times.append(time.time())
             elif i in self.keys_pressed_last:
+                self.key_pressed_times.pop(self.keys_pressed_last.index(i))
                 self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
