@@ -78,6 +78,7 @@ class draggable_box:
                 case 1: self.w = max(mx - self.x, 100)
                 case 2: self.h = max(my - self.y, 35)
                 case 3: self.w, self.h = (max(mx-self.x, 100), max(my-self.y, 35))
+            self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
             
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
