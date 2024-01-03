@@ -1,6 +1,6 @@
 import pygame, text, time, keyboard
 class draggable_box:
-    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: tuple = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro', max_text_size: int = 15) -> None:
+    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: pygame.Color = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro', max_text_size: int = 15) -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
@@ -36,7 +36,7 @@ class draggable_box:
         self.key_pressed_times = []
         self.alphabet =   'abcdefghijklmnopqrstuvwxyz1234567890\n    -='
         self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"£$%^&*()_+'
-        self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+        self.update_display_lines()
         #types of boxes:
         #start: at the start of the algorithm: 'START'
         #end: end of flowchart: 'END'
@@ -78,8 +78,7 @@ class draggable_box:
                 case 1: self.w = max(mx - self.x, 100)
                 case 2: self.h = max(my - self.y, 35)
                 case 3: self.w, self.h = (max(mx-self.x, 100), max(my-self.y, 35))
-            self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
-            
+            self.update_display_lines()
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
     
@@ -109,9 +108,16 @@ class draggable_box:
         else:
             self.colour = self.return_gradient(-1)
     
-    def hover(self):
+    def hover(self, one = (1000000000000000, 1000000000000000)):
         mx, my = pygame.mouse.get_pos()
-        return self.x <= mx <= self.x + self.w and self.y <= my <= self.y + self.h
+        if one[0] != 1000000000000000:
+            mx, my = one
+        if self.type in ['pro', 'start', 'end']:
+            return self.x <= mx <= self.x + self.w and self.y <= my <= self.y + self.h
+        elif self.type == 'io':
+            return (-0.5 * my)+self.x+(0.5*(self.h+self.y)) <= mx <= (-0.5 * my)+self.x+self.w + (0.5*self.y) and self.y <= my <= self.y + self.h
+        elif self.type == 'if':
+            return (my*-(self.w/self.h))+self.x+(self.w/2)+((self.y*self.w)/self.h) <= mx <= (my*-(self.w/self.h))+self.x+((3*self.w)/2)+((self.y*self.w)/self.h) and (my*(self.w/self.h))+self.x-(self.w/2)-((self.y*self.w)/self.h) <= mx <= (my*(self.w/self.h))+self.x+(self.w/2)-((self.y*self.w)/self.h)
     
     def edge(self):
         mx, my = pygame.mouse.get_pos()
@@ -120,16 +126,10 @@ class draggable_box:
         drag_type = 0
         #0 is not hover, 1 is horizontal, 2 is vertical, 3 is diagonal, 4 is other diagonal
         if not mpressed:
-            if not self.hover():
-                drag_type =  0
-            elif  (self.x + self.w)-margin< mx and self.y< my <(self.y + self.h) - margin:
-                drag_type =  1
-            elif (self.y + self.h)-margin< my and self.x< mx <(self.x + self.w) - margin:
-                drag_type =  2
-            elif (mx >= (self.x + self.w)-margin and my >= (self.y + self.h)-margin):
-                drag_type =  3
-            else:
-                drag_type =  0
+            if not self.hover((mx + margin, my)):
+                drag_type += 1
+            if not self.hover((self.x + (self.w/2), my + margin)):
+                drag_type += 2
         else:
             drag_type =  self.drag_type
         self.drag_type = drag_type
@@ -167,10 +167,21 @@ class draggable_box:
                         if not i in self.keys_pressed_last:
                             self.keys_pressed_last.append(i)
                             self.key_pressed_times.append(time.time())
-                        self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+                        self.update_display_lines()
                         if self.is_text_full:
-                            self.text = self.text[:-1]
-                            self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+                            if not self.text[-2:] == '\n':
+                                self.text = self.text[:-1]
+                            else:
+                                self.text = self.text[:-2]
+                                self.is_text_full = False
+                            self.update_display_lines(True)
                 elif i in self.keys_pressed_last:
                     self.key_pressed_times.pop(self.keys_pressed_last.index(i))
                     self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
+    
+    def update_display_lines(self, no_update_is_text_full = False):
+        if not no_update_is_text_full:
+            self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+        else:
+            self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+        self.line_lengths = [len(x)-2 for x in self.display_text]
