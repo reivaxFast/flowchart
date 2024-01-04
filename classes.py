@@ -15,10 +15,12 @@ class draggable_box:
         self.mpressedlast = False #was the mouse being pressed last frame (so the box can only be selected if clicked on)
         self.rpressedlast = False
         self.type = box_type.lower() #the type of box
-        self.drag_type = 0
-        self.start_selected_time = 0
+        self.drag_type = 0 #e.g. if it is being moved, of resized (0 is moved, 1 is horizobtal, 2 is vertical, 3 is both vertical and horizontal)
+        self.start_selected_time = 0 #this is for weather it is clicked or not
         self.max_text_size = max_text_size
-        self.writing_position = (0,0)
+        self.writing_position = (0,0) #where in the lines the cursor is
+        self.resize_offsetx = 0
+        self.resize_offsety = 0
         match self.type:
             case 'start': 
                 self.text = 'START'
@@ -75,9 +77,9 @@ class draggable_box:
                     self.drag_type = 4
         elif mpressed:
             match self.drag_type:
-                case 1: self.w = max(mx - self.x, 100)
-                case 2: self.h = max(my - self.y, 35)
-                case 3: self.w, self.h = (max(mx-self.x, 100), max(my-self.y, 35))
+                case 1: self.w = max((mx - self.x)+self.resize_offsetx, 100)
+                case 2: self.h = max((my - self.y)+self.resize_offsety, 35)
+                case 3: self.w, self.h = (max((mx - self.x)+self.resize_offsetx, 100), max((my - self.y)+self.resize_offsety, 35))
             self.update_display_lines()
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
@@ -95,8 +97,8 @@ class draggable_box:
                 text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'io': 
                 pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
-                
-            case 'if': pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
+            case 'if': 
+                pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
         
     
     def return_to_normal_colour(self):
@@ -134,6 +136,8 @@ class draggable_box:
                     drag_type += 1
                 if not self.hover((self.x + (self.w/2), my + margin)):
                     drag_type += 2
+            self.resize_offsetx = (self.x+self.w)-mx
+            self.resize_offsety = (self.y+self.h)-my
         else:
             drag_type =  self.drag_type
         self.drag_type = drag_type

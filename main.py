@@ -107,6 +107,8 @@ while True:
                 data['boxes with lines out'] = data['boxes with lines out'][:-1]
                 boxes_connections = boxes_connections[:-1]
         display_boxes(boxes)
+        if not boxes[-1].hover() and selected:
+            mouse_type = 0
         if mouse_type == 0:
             pygame.mouse.set_visible(True)
         else:
