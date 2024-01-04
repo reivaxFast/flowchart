@@ -126,10 +126,14 @@ class draggable_box:
         drag_type = 0
         #0 is not hover, 1 is horizontal, 2 is vertical, 3 is diagonal, 4 is other diagonal
         if not mpressed:
-            if not self.hover((mx + margin, my)):
-                drag_type += 1
-            if not self.hover((self.x + (self.w/2), my + margin)):
-                drag_type += 2
+            if self.type == 'if':
+                if not self.hover((mx+margin, my+margin)):
+                    drag_type = 3
+            else:
+                if not self.hover((mx + margin, my)):
+                    drag_type += 1
+                if not self.hover((self.x + (self.w/2), my + margin)):
+                    drag_type += 2
         else:
             drag_type =  self.drag_type
         self.drag_type = drag_type
