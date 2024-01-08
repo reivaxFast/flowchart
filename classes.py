@@ -1,6 +1,6 @@
-import pygame, text, time, keyboard
+import pygame, text, time
 class draggable_box:
-    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: pygame.Color = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro', max_text_size: int = 15) -> None:
+    def __init__(self, x: int, y: int, w: int, h: int, window: pygame.Surface, normal_colour: pygame.Color = (255, 255, 255), shaded_colour: tuple = (200, 200, 200), gradient_speed: float = 0.1, box_type: str = 'pro', max_text_size: int = 15, text_colour = (0,0,0)) -> None:
         self.x = x #x position
         self.y = y #y position
         self.w = w #width
@@ -9,6 +9,7 @@ class draggable_box:
         self.colour = normal_colour #colour
         self.normal_colour = normal_colour #default colour
         self.shaded_colour = shaded_colour #shaded colour
+        self.text_colour = text_colour
         self.gradient = 0 #how far between shaded and default is the colour (0 is unshaded, 1 is shaded)
         self.gradient_speed = gradient_speed #how fast to change the gradient
         self.selected = False #is the box being moved?
@@ -101,6 +102,7 @@ class draggable_box:
                 text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'io': 
                 pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
+                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'io')
             case 'if': 
                 pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
         
@@ -191,7 +193,7 @@ class draggable_box:
     
     def update_display_lines(self, no_update_text_full = False):
         if not no_update_text_full:
-            self.display_text, self.text_size, self.text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+            self.display_text, self.text_size, self.text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines, self.type)
         else:
             self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
         self.line_lengths = [len(x)-2 for x in self.display_text]
