@@ -181,11 +181,9 @@ class draggable_box:
                             self.key_pressed_times.append(time.time())
                         self.update_display_lines()
                         if self.text_full:
-                            if not self.text[-2:] == '\n':
-                                self.text = self.text[:-1]
-                            else:
-                                self.text = self.text[:-2]
+                            if self.text[-1:] == '\n':
                                 self.text_full = False
+                            self.text = self.text[:-1]
                             self.update_display_lines(True)
                 elif i in self.keys_pressed_last:
                     self.key_pressed_times.pop(self.keys_pressed_last.index(i))

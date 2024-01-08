@@ -41,7 +41,6 @@ def return_lines_in_a_box(textvalue: str, box_size: tuple, max_size = 10000, min
                         lines.insert(largest_x_index, line[:i])
                         run = True
                         break
-        print(curr_size)
         return lines, curr_size, len(lines) * curr_size > box_size[1]
     else:
         return [''], 10, False
