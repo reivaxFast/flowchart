@@ -76,11 +76,15 @@ class draggable_box:
                 if time.time()-self.start_selected_time < click_speed and  not self.type in ['start', 'end']:
                     self.drag_type = 4
         elif mpressed:
+            width, height = self.w, self.h
             match self.drag_type:
                 case 1: self.w = max((mx - self.x)+self.resize_offsetx, 100)
                 case 2: self.h = max((my - self.y)+self.resize_offsety, 35)
                 case 3: self.w, self.h = (max((mx - self.x)+self.resize_offsetx, 100), max((my - self.y)+self.resize_offsety, 35))
             self.update_display_lines()
+            if self.text_full:
+                self.w, self.h = width, height
+                self.update_display_lines()
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
     
@@ -160,7 +164,7 @@ class draggable_box:
             return False
     
     def write(self):
-        if not self.is_text_full:
+        if not self.text_full:
             keys = pygame.key.get_pressed()
             for i, event in enumerate(keys):
                 if event and not keys[pygame.K_LCTRL] and not keys[pygame.K_RCTRL]:
@@ -176,20 +180,20 @@ class draggable_box:
                             self.keys_pressed_last.append(i)
                             self.key_pressed_times.append(time.time())
                         self.update_display_lines()
-                        if self.is_text_full:
+                        if self.text_full:
                             if not self.text[-2:] == '\n':
                                 self.text = self.text[:-1]
                             else:
                                 self.text = self.text[:-2]
-                                self.is_text_full = False
+                                self.text_full = False
                             self.update_display_lines(True)
                 elif i in self.keys_pressed_last:
                     self.key_pressed_times.pop(self.keys_pressed_last.index(i))
                     self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
     
-    def update_display_lines(self, no_update_is_text_full = False):
-        if not no_update_is_text_full:
-            self.display_text, self.text_size, self.is_text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
+    def update_display_lines(self, no_update_text_full = False):
+        if not no_update_text_full:
+            self.display_text, self.text_size, self.text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
         else:
             self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
         self.line_lengths = [len(x)-2 for x in self.display_text]

@@ -62,4 +62,19 @@ def draw_line(boxes: list, indexs: tuple, boxes_index: list, win:pygame.Surface,
     if width2 == 0:
         pygame.draw.circle(win, (255, 255, 255), (end[0]+1, end[1]+1), (width/2))
     pygame.draw.lines(win, (255, 255, 255), False, points, width)
-    
+
+def get_lines_hitbox(boxes, boxes_connections, boxes_index):
+    points = []
+    for i in boxes_connections:
+        if i[1] != -1:
+            index1 = boxes_index.index(i[0])
+            start = (boxes[index1].x+(boxes[index1].w/2), boxes[index1].y + boxes[index1].h)
+            width1 = boxes[index1].w
+            index2 = boxes_index.index(i[1])
+            end = (boxes[index2].x + (boxes[index2].w/2), boxes[index2].y)
+            width2 = boxes[index2].w
+            points.append(get_line_positions(start, end, width1, width2)[0])
+
+def display_lines(window, boxes, boxes_connections, boxes_index):
+    for i in boxes_connections:
+        draw_line(boxes, i, boxes_index, window, 10)

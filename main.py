@@ -59,8 +59,7 @@ while True:
     if not rpressed: #if the right click is not pressed:
         justline = False #there must not be a line
     selected = False #selected is true for when a box i being dragged
-    for i in boxes_connections:
-        lines.draw_line(boxes, i, boxes_index, window, 10)
+    lines.display_lines(window, boxes, boxes_connections, boxes_index)
         
     if not data['writing']:
         for i, box in enumerate(boxes): #this checks whether a box is selected
