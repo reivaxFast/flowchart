@@ -61,7 +61,7 @@ def render_text_in_box(lines: list, surface: pygame.Surface, box_position: tuple
                     surface.blit(text, (box_position[0], box_position[1]+(size*i)))
             else:
                 for i, text in enumerate(texts):
-                    surface.blit(text, (box_position[0]+((box_size[0]/2)-(text.get_rect().width/2)), box_position[1]+(size*i)+((box_size[1]-(size * len(texts)))/2)))
+                    surface.blit(text, (box_position[0]+((box_size[0]/2)-(text.get_rect().width/2)), box_position[1]+(size*i)+(((box_size[1]-(size * len(texts)))-(size/2))/2)))
         else:
             start_offset = math.ceil(box_size[1]*0.5)
             line_offset = math.ceil(size*0.5)
