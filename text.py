@@ -1,5 +1,6 @@
 import pygame, math
 def return_lines_in_a_box(textvalue: str, box_size: tuple, max_size = 10000, min_size = 10, numbered = False, box_type = 'pro'):
+    box_size = (box_size[0], box_size[1]-10)
     if len(textvalue) == 0 and numbered:
         numbered = False
         textvalue = '1'
@@ -55,15 +56,23 @@ def render_text_in_box(lines: list, surface: pygame.Surface, box_position: tuple
         text_type = 'fonts/Cascadia.ttf'
         font = pygame.font.Font(text_type, size)
         texts = [font.render(x, True, colour) for x in lines]
-        if not box_type == 'io':
+        if not box_type in ['io', 'if']:
             if not centered:
                 for i, text in enumerate(texts):
                     surface.blit(text, (box_position[0], box_position[1]+(size*i)))
             else:
                 for i, text in enumerate(texts):
                     surface.blit(text, (box_position[0]+((box_size[0]/2)-(text.get_rect().width/2)), box_position[1]+(size*i)+(((box_size[1]-(size * len(texts)))-(size/2))/2)))
-        else:
+        elif box_type == 'io':
             start_offset = math.ceil(box_size[1]*0.5)
             line_offset = math.ceil(size*0.5)
             for i, text in enumerate(texts):
                 surface.blit(text, (box_position[0] + (start_offset-(line_offset*i)), box_position[1]+(size*i)))
+        else:
+            text = texts[0]
+            ind_size = font.render('a', True, (255, 255, 255)).get_rect().width
+            margin = ((box_size[0]/box_size[1])*((size/2)+5))
+            largest_len = int((box_size[0]-(margin*2))//ind_size)
+            if len(lines[0])>largest_len:
+                text = font.render(lines[0][:largest_len-3]+'...', True, colour)
+            surface.blit(text, (box_position[0]+margin, box_position[1]+(box_size[1]//2)-(size//2)))

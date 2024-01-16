@@ -123,6 +123,7 @@ while True:
         display_boxes(boxes, True)
         if mpressed and not boxes[-1].hover() and not mpressed_last:
             data['writing'] = False
+            boxes[-1].stop_writing()
     mpressed_last = mpressed
     pygame.display.flip() #update
     clock.tick(framerate)

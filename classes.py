@@ -31,6 +31,10 @@ class draggable_box:
                 self.text = 'END'
                 self.centered = True
                 self.numbered_lines = False
+            case 'if':
+                self.text = 'if'
+                self.centered = False
+                self.numbered_lines = False
             case _: 
                 self.text = ''
                 self.centered = False
@@ -46,6 +50,13 @@ class draggable_box:
         #proscess: e.g. declaring/changing variables: 'PRO'
         #input/output: 'IO'
         #descision (if statement): 'IF'
+        
+        #DRAG TYPES:
+        #0: normal
+        #1: horizontal resize
+        #2: vertical resize
+        #3: normal resize
+        #4: writing
         
     def set_selected(self):
         mx, my = pygame.mouse.get_pos() # getting mouse position
@@ -104,7 +115,12 @@ class draggable_box:
                 pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
                 text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'io')
             case 'if': 
-                pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
+                if self.drag_type != 4:
+                    pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
+                    text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'if')
+                else:
+                    pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
+                    text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
         
     
     def return_to_normal_colour(self):
@@ -197,3 +213,6 @@ class draggable_box:
         else:
             self.display_text, self.text_size, _ = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines)
         self.line_lengths = [len(x)-2 for x in self.display_text]
+    
+    def stop_writing(self):
+        self.drag_type = 0
