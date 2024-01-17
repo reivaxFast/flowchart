@@ -80,7 +80,7 @@ class draggable_box:
                 self.offsety = self.y - my
             
             if self.selected and mpressed:
-                if time.time()-self.start_selected_time > click_speed and not writing:
+                if not writing:
                     self.x = mx + self.offsetx
                     self.y = my + self.offsety
             else:
@@ -100,27 +100,27 @@ class draggable_box:
         self.mpressedlast = mpressed
         self.rpressedlast = rpressed
     
-    def display(self):
+    def display(self, offset:tuple=(0,0)):
         match self.type:
             case 'pro': 
-                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
-                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x+offset[0], self.y+offset[1]), (self.w,self.h)))
+                text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'start': 
-                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
-                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x+offset[0], self.y+offset[1]), (self.w,self.h)), border_radius=10)
+                text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'end': 
-                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)), border_radius=10)
-                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
+                pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x+offset[0], self.y+offset[1]), (self.w,self.h)), border_radius=10)
+                text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered)
             case 'io': 
                 pygame.draw.polygon(self.window, self.colour, [(self.x + (self.h / 2), self.y), (self.x + self.w, self.y), ((self.x + self.w)-(self.h / 2), self.y + self.h), (self.x, self.y + self.h)])
-                text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'io')
+                text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'io')
             case 'if': 
                 if self.drag_type != 4:
                     pygame.draw.polygon(self.window, self.colour, [(self.x, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y), (self.x + self.w, self.y + (self.h / 2)), (self.x + (self.w / 2), self.y + self.h)])
-                    text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'if')
+                    text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered, 'if')
                 else:
-                    pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x, self.y), (self.w,self.h)))
-                    text.render_text_in_box(self.display_text, self.window, (self.x, self.y), (self.w, self.h), self.text_size, (0,0,0), self.centered)
+                    pygame.draw.rect(self.window, self.colour, pygame.Rect((self.x+offset[0], self.y+offset[1]), (self.w,self.h)))
+                    text.render_text_in_box(self.display_text, self.window, (self.x+offset[0], self.y+offset[1]), (self.w, self.h), self.text_size, (0,0,0), self.centered)
         
     
     def return_to_normal_colour(self):

@@ -8,7 +8,6 @@ def get_line_positions(start: tuple, end: tuple, width1 = 200, width2 = 200):
         if ((start[0] < end[0] + ave_W +20 and start[0]  + ave_W + 20 > end[0] and width2 != 0) or (start[0] < end[0] + half_width1 + 10 and start[0]  + half_width1 + 10> end[0] and width2 == 0)):
             li.append((start[0], start[1]+10))
             if start[0] > end[0]:
-                
                 li.append(((start[0] - (half_width1+10)), start[1]+10))
                 li.append(((start[0] - (half_width1+10)), (start[1]+end[1])/2))
                 if width2 != 0:
