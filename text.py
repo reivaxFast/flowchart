@@ -43,7 +43,10 @@ def return_lines_in_a_box(textvalue: str, box_size: tuple, max_size = 10000, min
                         largest_x_index=lines.index(i)
                         line = lines.pop(largest_x_index)
                         i = new_size//ind_size
-                        lines.insert(largest_x_index, '  '+line[i:])
+                        if numbered:
+                            lines.insert(largest_x_index, '  '+line[i:])
+                        else:
+                            lines.insert(largest_x_index, ' '+line[i:])
                         lines.insert(largest_x_index, line[:i])
                         run = True
                         break
