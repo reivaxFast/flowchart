@@ -89,7 +89,7 @@ while True:
                 else:
                     i.return_to_normal_colour()
                 if i.rclick(): #if the box is being leftpressed on
-                    if not data['line to mouse'] and not justline and not boxes_index[(len(boxes)-p)-1] in data['boxes with lines out'] and not i.type == 'end': #if there is not a line to the mouse, and a line was not just created and, this box is does not have a line coming out of it already
+                    if not data['line to mouse'] and not justline and (not boxes_index[(len(boxes)-p)-1] in data['boxes with lines out'] or i.type == 'if') and not i.type == 'end': #if there is not a line to the mouse, and a line was not just created and, this box is does not have a line coming out of it already
                         boxes_connections.append((boxes_index[(len(boxes)-p)-1], -1)) #append a tuple containing the 'true' index of this box and -1 (-1 denotes a line to mouse)
                         data['line to mouse'] = True #so another line to mouse cannot be made
                         data['boxes with lines out'].append(boxes_index[(len(boxes)-p)-1]) #so another line cannot be made out of this box
@@ -99,6 +99,14 @@ while True:
                         data['line to mouse'] = False #as the line has been connected to this box it is no longer connected to the mouse
                         data['boxes with lines in'].append(boxes_index[(len(boxes)-p)-1]) #this box now has a line into it
                         justline = True #so the box does not emediatly have a line from it
+                    if boxes_index[(len(boxes)-p)-1] in data['boxes with lines out'] and not justline:
+                        ind = boxes_index[(len(boxes)-p)-1]
+                        for d, j in enumerate(boxes_connections):
+                            if j[0] == ind:
+                                break
+                        boxes_connections.pop(d)
+                        data['boxes with lines out'].pop(data['boxes with lines out'].index(ind))
+                        justline = True
             if not hov:
                 mouse_type = 0
             if rpressed and data['line to mouse'] and not justline:
