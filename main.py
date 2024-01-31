@@ -14,7 +14,7 @@ pygame.display.set_caption(caption) #set title
 clock = pygame.time.Clock() # setup for framerate for consitiant animations
 framerate = 120
 width, height = 1920, 1009 #set height and width
-window = pygame.display.set_mode((width, height), pygame.RESIZABLE) #show window
+window = pygame.display.set_mode((600, 600), pygame.RESIZABLE) #show window
 
 window_handle = max_window.Call_Window.find_window(caption)  #replace MyWindow with actual name as captioned.
 if window_handle:

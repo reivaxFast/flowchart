@@ -1,6 +1,6 @@
 import win32con
 import win32gui
-
+#win32con and win32gui in pywin32 e.g. pip install pywin32
 class Call_Window():
     def __init__():
         pass

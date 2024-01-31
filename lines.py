@@ -5,7 +5,7 @@ def get_line_positions(start: tuple, end: tuple, width1 = 200, width2 = 200, if2
     ave_W = half_width1 + half_width2
     li = []
     if not if2:
-        li = [start]
+        li = [(start[0], start[1]-20)]
         if ((start[1] + 20 > end[1] and width2 != 0) or (start[1] + 10 > end[1] and width2 == 0)) and (not 20 > end[1] - start[1] > -20 or abs(end[0]-start[0]) >ave_W + 20):
             if ((start[0] < end[0] + ave_W +20 and start[0]  + ave_W + 20 > end[0] and width2 != 0) or (start[0] < end[0] + half_width1 + 10 and start[0]  + half_width1 + 10> end[0] and width2 == 0)):
                 li.append((start[0], start[1]+10))
@@ -42,9 +42,44 @@ def get_line_positions(start: tuple, end: tuple, width1 = 200, width2 = 200, if2
             else:
                 li.append((start[0], max((start[1]+end[1])/2, start[1] + 10)))
                 li.append((end[0], max((start[1]+end[1])/2, start[1] + 10)))
-        li.append(end)
+        if width2 != 0:
+            li.append((end[0], end[1]+20))
+        else:
+            li.append(end)
     else:
-        li = [(start[0]-half_width1, start[1]-(h1/2))]
+        if start[0] > end[0]:
+            li = [(start[0]-half_width1+20, start[1]-(h1/2))]
+        else:
+            li = [(start[0]+half_width1-20, start[1]-(h1/2))]
+        if li[0][1] < end[1]-10:
+            if end[0] < start[0] + half_width1 + 10 and end[0] > start[0] - half_width1 - 10:
+                if start[0] > end[0]:
+                    li.append((li[0][0]-30, li[0][1]))
+                    li.append((li[0][0]-30, (li[0][1]+end[1])/2))
+                    li.append((end[0], (li[0][1]+end[1])/2))
+                else:
+                    li.append((li[0][0]+30, li[0][1]))
+                    li.append((li[0][0]+30, (li[0][1]+end[1])/2))
+                    li.append((end[0], (li[0][1]+end[1])/2))
+            else:
+                li.append((end[0], li[0][1]))
+        else:
+            if end[0] + half_width1 + 20 > li[0][0] and end[0] < start[0]:
+                li.append((end[0]-half_width2-10, li[0][1]))
+                li.append((end[0]-half_width2-10, end[1]-10))
+                li.append((end[0], end[1]-10))
+            elif end[0] - half_width1 - 20 <= li[0][0] and end[0] >= start[0]:
+                li.append((end[0]+half_width2+10, li[0][1]))
+                li.append((end[0]+half_width2+10, end[1]-10))
+                li.append((end[0], end[1]-10))
+            elif end[0] < start[0]:
+                li.append((((end[0]+half_width2)+li[0][0])/2, li[0][1]))
+                li.append((((end[0]+half_width2)+li[0][0])/2, end[1]-10))
+                li.append((end[0], end[1]-10))
+            else:
+                li.append((((end[0]-half_width2)+li[0][0])/2, li[0][1]))
+                li.append((((end[0]-half_width2)+li[0][0])/2, end[1]-10))
+                li.append((end[0], end[1]-10))
         li.append(end)
     return li
 
