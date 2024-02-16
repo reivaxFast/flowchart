@@ -19,7 +19,7 @@ class draggable_box:
         self.drag_type = 0 #e.g. if it is being moved, of resized (0 is moved, 1 is horizobtal, 2 is vertical, 3 is both vertical and horizontal)
         self.start_selected_time = 0 #this is for weather it is clicked or not
         self.max_text_size = max_text_size
-        self.writing_position = (0,0) #where in the lines the cursor is
+        self.writing_position = 0 #where in the lines the cursor is
         self.resize_offsetx = 0
         self.resize_offsety = 0
         match self.type:
@@ -41,8 +41,8 @@ class draggable_box:
                 self.numbered_lines = True
         self.keys_pressed_last = []
         self.key_pressed_times = []
-        self.alphabet =   'abcdefghijklmnopqrstuvwxyz1234567890\n    -='
-        self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"£$%^&*()_+'
+        self.alphabet =   'abcdefghijklmnopqrstuvwxyz0123456789\n    -='
+        self.shift_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ)!"£$%^&*(_+'
         self.update_display_lines()
         #types of boxes:
         #start: at the start of the algorithm: 'START'
@@ -181,18 +181,43 @@ class draggable_box:
         else:
             return False
     
+
     def write(self):
         if not self.text_full:
-            keys = pygame.key.get_pressed()
+            keys = text.get_pressed_keys()
+            for i, j in enumerate(keys):
+                if not j in self.keys_pressed_last or time.time()-self.key_pressed_times[self.keys_pressed_last.index(j)]> 0.5:
+                    if j not in ['backspace', 'del']:
+                        self.text = self.text + j
+                    else:
+                        self.text = self.text[:-1]
+                    self.keys_pressed_last.append(j)
+                    self.key_pressed_times.append(time.time())
+                    self.update_display_lines()
+            for i, j in enumerate(self.keys_pressed_last):
+                if j not in keys:
+                    self.key_pressed_times.pop(i)
+                    self.keys_pressed_last.pop(i)
+            
+            '''ke = pygame.key.get_pressed()
+            keys = []
+            for i in range(len(ke)):
+                keys.append(ke[i])
             for i, event in enumerate(keys):
-                if event and not keys[pygame.K_LCTRL] and not keys[pygame.K_RCTRL]:
+                if event and not ke[pygame.K_LCTRL] and not ke[pygame.K_RCTRL]:
                     if not i in self.keys_pressed_last or time.time() - self.key_pressed_times[self.keys_pressed_last.index(i)] > 0.5:
-                        if i in range(4, len(self.alphabet)+4) and i != 42:
-                            if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]:
-                                self.text = self.text + self.alphabet[i-4]
+                        print(i)
+                        if i in range(97, len(self.alphabet)+97):
+                            if not ke[pygame.K_LSHIFT] and not ke[pygame.K_RSHIFT]:
+                                self.text = self.text + self.alphabet[i-97]
                             else:
-                                self.text = self.text + self.shift_char[i-4]
-                        elif i == 42:
+                                self.text = self.text + self.shift_char[i-97]
+                        elif i in range(48, 58):
+                            if not ke[pygame.K_LSHIFT] and not ke[pygame.K_RSHIFT]:
+                                self.text = self.text + self.alphabet[i-22]
+                            else:
+                                self.text = self.text + self.shift_char[i-22]
+                        elif i == 8:
                             self.text = self.text[:-1]
                         if not i in self.keys_pressed_last:
                             self.keys_pressed_last.append(i)
@@ -205,8 +230,7 @@ class draggable_box:
                             self.update_display_lines(True)
                 elif i in self.keys_pressed_last:
                     self.key_pressed_times.pop(self.keys_pressed_last.index(i))
-                    self.keys_pressed_last.pop(self.keys_pressed_last.index(i))
-    
+                    self.keys_pressed_last.pop(self.keys_pressed_last.index(i))'''
     def update_display_lines(self, no_update_text_full = False):
         if not no_update_text_full:
             self.display_text, self.text_size, self.text_full = text.return_lines_in_a_box(self.text, (self.w, self.h), 15, 10, self.numbered_lines, self.type)

@@ -1,4 +1,7 @@
-import pygame, math
+import pygame, math, keyboard
+
+KEYS =         ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", '#', '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '/', '*', '+', 'del', 'enter', 'backspace', 'space','.']
+SHIFTED_KEYS = ['!', '"', '£', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '~',  '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?']
 def return_lines_in_a_box(textvalue: str, box_size: tuple, max_size = 10000, min_size = 10, numbered = False, box_type = 'pro'):
     box_size = (box_size[0], box_size[1]-10)
     if len(textvalue) == 0 and numbered:
@@ -79,3 +82,25 @@ def render_text_in_box(lines: list, surface: pygame.Surface, box_position: tuple
             if len(lines[0])>largest_len:
                 text = font.render(lines[0][:largest_len-3]+'...', True, colour)
             surface.blit(text, (box_position[0]+margin, box_position[1]+(box_size[1]//2)-(size//2)))
+
+
+def get_pressed_keys():
+    ret = []
+    if keyboard.is_pressed('shift'):
+        for i in SHIFTED_KEYS:
+            if keyboard.is_pressed(i):
+                ret.append(i)
+    else:
+        for i in KEYS:
+            if keyboard.is_pressed(i):
+                if not i in ['*', '+', '.']:
+                    if i == 'enter':
+                        ret.append('\n')
+                    elif i == 'space':
+                        ret.append(' ')
+                    else:
+                        ret.append(i)
+                else:
+                    if not ('=' in ret or '8' in ret or 'del' in ret):
+                        ret.append(i)
+    return ret

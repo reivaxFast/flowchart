@@ -13,7 +13,6 @@ pygame.init() #initailise pygame
 pygame.display.set_caption(caption) #set title
 clock = pygame.time.Clock() # setup for framerate for consitiant animations
 framerate = 120
-width, height = 1920, 1009 #set height and width
 window = pygame.display.set_mode((600, 600), pygame.RESIZABLE) #show window
 
 window_handle = max_window.Call_Window.find_window(caption)  #replace MyWindow with actual name as captioned.
@@ -23,6 +22,7 @@ pygame.display.set_icon(icon)
 #colours
 boxes_colour = (25, 100, 100)
 bg_colour = (31, 31, 31)
+width, height = window.get_size() #set height and width
 
 boxes = [] #set up the list to hold the box classes in
 boxes_index = [] #set up list that keeps track of which box is which (so connections can be made between boxes while boxes are being moved around in lists)
