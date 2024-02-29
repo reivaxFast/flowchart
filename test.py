@@ -1,4 +1,11 @@
-import pygame, sys, keyboard
+print(eval('10 < 11'))
+
+print('gugh')
+
+
+
+
+'''import pygame, sys, keyboard
 p = [] # '1234567890-=qwertyuiop[]asdfghjkl;'#\zxcvbnm,./'
 for i in '!"£$%^&*()_+QWERTYUIOP{}ASDFGHJKL:@~|ZXCVBNM<>?':
     p.append(i)
@@ -6,7 +13,7 @@ print(p)
 
 
 
-'''KEY_VALUES = {pygame.K_0: '0'}
+KEY_VALUES = {pygame.K_0: '0'}
 def get_pressed():
     ke = pygame.key.get_pressed()
 # Initialize Pygame
